@@ -77,6 +77,25 @@ void USART1_IRQHandler(void)
 				}
 			}
     } 
+		
+		if(USART_GetFlagStatus(USART1, USART_FLAG_ORE)!= RESET)
+		{
+			USART_ReceiveData(USART1);
+			USART_ClearFlag(USART1, USART_FLAG_ORE);
+		}
+		if(USART_GetFlagStatus(USART1, USART_FLAG_NE)!= RESET)
+		{
+			USART_ClearFlag(USART1, USART_FLAG_NE);
+		}
+		if(USART_GetFlagStatus(USART1, USART_FLAG_FE)!= RESET)
+		{
+			USART_ClearFlag(USART1, USART_FLAG_FE);
+		}
+		if(USART_GetFlagStatus(USART1, USART_FLAG_PE)!= RESET)
+		{
+			USART_ClearFlag(USART1, USART_FLAG_PE);
+		}
+		
 }
 
 void YTSensorCtrlSystick10Routine(void)
@@ -102,12 +121,12 @@ static void PMSensor_Start(void)
 {
 	AIRV_ON;
 	USART_Cmd(USART1, ENABLE);
-	SENSOR_ON;
+	USART_ITConfig  (USART1,USART_IT_RXNE,ENABLE );
 	timer100ms=0;
 	SensorState = 1;
 	SensorFaultFlag=0;
 	PM25ug = 100;
-	USART_ITConfig  (USART1,USART_IT_RXNE,ENABLE );
+	SENSOR_ON;
 }
 
 static void PMSensor_Stop(void)
@@ -207,8 +226,8 @@ USART_InitTypeDef USART_InitStructure;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 	
-	USART_Cmd(USART1, ENABLE);
-	USART_ITConfig(USART1,USART_IT_RXNE,ENABLE );
+//	USART_Cmd(USART1, ENABLE);
+//	USART_ITConfig(USART1,USART_IT_RXNE,ENABLE );
 	
 	
 	System.Device.Usart1.PM25ug_Get=PM25ug_Get;

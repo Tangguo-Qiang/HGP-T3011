@@ -307,7 +307,7 @@ void CommTalk_Echo(byte length)
 								CommTxBuffer[FRAME_AIDORDER]= App.SysStatus.Power;
 								CommTxBuffer[FRAME_DATABEGIN]= MAIN_VERSION;
 								CommTxBuffer[FRAME_DATABEGIN+1]= SUB_VERSION;
-							CommTxBuffer[FRAME_END]= Data_Sum(CommTxBuffer,COMMTXDATASIZE-1);
+							  CommTxBuffer[FRAME_END]= Data_Sum(CommTxBuffer,COMMTXDATASIZE-1);
 				
 								break;
 						}
