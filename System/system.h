@@ -172,18 +172,26 @@ typedef struct
             TestStatus (*ReadString)(byte* data); 
 
         }Usart3;				
-        				
+#ifdef WINSEN_HCHO        				
+        struct Usart1
+        {
+            void(*HCHOSensor_Start)(void);
+            void(*HCHOSensor_Stop)(void);
+            uint16_t (*HCHOppb_Get)(void);
+
+        }Usart1;	
+#else				
         struct Usart1
         {
             void(*PMSensor_Start)(void);
             void(*PMSensor_Stop)(void);
-#ifdef __Cubic_PM25
+ #ifdef __Cubic_PM25
 					void (*PMSensor_Req)(CubicSensorReqTypedef req);
-#endif
+ #endif
             uint16_t (*PM25ug_Get)(void);
 
-        }Usart1;				
-				
+        }Usart1;		
+#endif				
         struct Pwm
         {
             void(*CO2Sensor_Start)(void);

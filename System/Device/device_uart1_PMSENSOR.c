@@ -1,5 +1,7 @@
 #include "system.h"
 
+#ifndef WINSEN_HCHO
+
 #define USART1_CLK                       RCC_APB2Periph_USART1
 
 #define SENSORSLEEP_PORT	GPIOA
@@ -20,6 +22,7 @@ typedef enum
     SENSOR_EMPTY       		= (byte)0x00,
     SENSOR_YUNTONG      	= (byte)0x01,
     SENSOR_CUBIC       		= (byte)0x02,
+    SENSOR_WEISHENG       = (byte)0x03,
     SENSOR_OTHER   
     
 }SensorTypeEnum;
@@ -27,11 +30,11 @@ typedef enum
 static ushort PM25ug=50;
 static byte TxBuffer[8]={0};
 static byte RxBuffer[RXBUFFERLENGTH]={0};
+static byte DataLength=0;
 static byte Index=0;
 //static byte SensorState=0;
 static byte SensorFaultFlag=0;
 static ushort TestVal=0;
-//static ushort timer100ms=0;
 
 byte SensorType=SENSOR_EMPTY;
 
@@ -40,7 +43,7 @@ static ushort SumCalculate(void)
 {
 	ushort temp=0;
 	unsigned char i;
-	for(i = 0;i < 30; i++)
+	for(i = 0;i <(DataLength-2); i++)
 	{
 			temp += RxBuffer[i];
 	}
@@ -77,7 +80,7 @@ void USART1_IRQHandler(void)
     if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET) 
     {
 			RxBuffer[Index] = (uint8_t)USART_ReceiveData(USART1);
-			if(SensorType!=SENSOR_CUBIC)
+			if (SensorType!=SENSOR_CUBIC)
 			{
 				if(Index<2)
 				{
@@ -91,9 +94,11 @@ void USART1_IRQHandler(void)
 				else
 				{
 					Index++;
-					if(Index==32)
+					if(Index==4)
+						DataLength = 4+RxBuffer[3];
+					if(Index==DataLength)
 					{
-						TestVal = ((RxBuffer[30]<<8)|RxBuffer[31]);
+						TestVal = ((RxBuffer[DataLength-2]<<8)|RxBuffer[DataLength-1]);
 						if(TestVal==SumCalculate())
 						{
 							PM25ug =((RxBuffer[6]<<8)|RxBuffer[7]);
@@ -103,6 +108,7 @@ void USART1_IRQHandler(void)
 						Index = 0;
 						InitBuffer();
 					}
+					
 				}
 			}
 			else
@@ -313,3 +319,4 @@ USART_InitTypeDef USART_InitStructure;
 	System.Device.Usart1.PMSensor_Start=PMSensor_Start;
 	System.Device.Usart1.PMSensor_Stop=PMSensor_Stop;
 }
+#endif

@@ -29,8 +29,11 @@ static BypassStatus PrepBypass=BypassReady;
 
 static void SystemPowerOn(void)
 {
-	
+#ifdef WINSEN_HCHO
+	System.Device.Usart1.HCHOSensor_Start();
+#else	
 	System.Device.Usart1.PMSensor_Start();
+#endif	
 	System.Device.Pwm.CO2Sensor_Start();
 	
 	App.SysStatus.Power= System.Device.MotoFan.MotoPowerSet(POWER_ON);
@@ -47,11 +50,13 @@ static void SystemPowerOn(void)
 static void SystemPowerOff(void)
 {
 	System.Device.Pwm.CO2Sensor_Stop();
+#ifdef WINSEN_HCHO
+	System.Device.Usart1.HCHOSensor_Stop();
+#else
 	System.Device.Usart1.PMSensor_Stop();
-	App.SysCtrlPara.XFmotoDuty =0;
-	System.Device.MotoFan.XFMoto_DutySet(App.SysCtrlPara.XFmotoDuty,0);
-	App.SysCtrlPara.PFmotoDuty =0;
-	System.Device.MotoFan.PFMoto_DutySet(App.SysCtrlPara.PFmotoDuty,0);
+#endif
+	System.Device.MotoFan.XFMoto_DutySet(0,0);
+	System.Device.MotoFan.PFMoto_DutySet(0,0);
 	App.SysCtrlPara.AuxiliaryHeatSet =HEATER_OFF;
 	App.FuncPara.SwitchState=0;
 	FuncTalk_Trans(FUNC_SWITCH_SET);

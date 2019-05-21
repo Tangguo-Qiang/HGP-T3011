@@ -39,7 +39,7 @@
 
 
 
-#define AIRFLOWCTRL_RUNSTEP_PERSENT	100   //1%
+#define AIRFLOWCTRL_RUNSTEP_PERSENT	50   //1%
 
 
 typedef enum 

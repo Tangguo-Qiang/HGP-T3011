@@ -29,9 +29,11 @@ extern void Init_ADC1(void);
 extern void Init_MotoFan(void);
 
 extern void Init_Beep(void);
-
+#ifdef WINSEN_HCHO
+extern void Uart1_InitHCHO(void);
+#else
 extern void Uart1_Init(void);
-
+#endif
 extern void Init_Timer(void);
 
 extern void Init_Iwdog(void);
@@ -78,7 +80,11 @@ void InitDevice(void)
 	
   	Init_Beep();
 	
+#ifdef WINSEN_HCHO
+	  Uart1_InitHCHO();
+#else
 	  Uart1_Init();
+#endif
 	
 		Init_MotoFan();
 	

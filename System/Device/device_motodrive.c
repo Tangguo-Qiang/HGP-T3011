@@ -9,9 +9,8 @@
 #define PWM_FREQ_1K		8000
 #define PWM_PLUSE_PERIOD		PWM_FREQ_10K
 
-#define MOTOFREQ_STEP	5		//5% per step
 
-#define MOTO_STARTDUTY	6000
+#define MOTO_STARTDUTY	7000
 
 
 #define HV_PORT	GPIOB
@@ -257,6 +256,7 @@ void EXTI4_15_IRQHandler(void)
 void MotoFanSystick10Routine(void)
 {
 	Times100ms++;
+
 	if(Times100ms>9)
 	{
 		Times100ms=0;
@@ -267,114 +267,163 @@ void MotoFanSystick10Routine(void)
 		PFmotoRpm = PFmotoFBPulse*5;
 		pSysStatus->PFmotoRpm = PFmotoRpm; 
 		PFmotoFBPulse = 0;
-	}
-	
-	
-	if(XFmotoRpmSet)
-	{
-		pSysStatus->XFmotoFault=1;
-		if(XFmotoRpmSet>(XFmotoRpm+60))
+		
+		if(XFmotoRpmSet)
 		{
-			XFmotoDuty += 20;
-			if(XFmotoDuty>10000)
+			pSysStatus->XFmotoFault=1;
+			if(XFmotoRpmSet>(XFmotoRpm+120))
 			{
-				XFmotoDuty =10000;
-				if(XFmotoRpm<300)
+				XFmotoDuty += 100;
+				if(XFmotoDuty>10000)
+				{
+					XFmotoDuty =10000;
+					if(XFmotoRpm<300)
+						pSysStatus->XFmotoFault=100;
+				}
+				SetMotoFreq_MOTO1(XFmotoDuty);
+			}
+			else if(XFmotoRpmSet>(XFmotoRpm+80))
+			{
+				XFmotoDuty += 40;
+				if(XFmotoDuty>10000)
+				{
+					XFmotoDuty =10000;
+					if(XFmotoRpm<300)
+						pSysStatus->XFmotoFault=100;
+				}
+				SetMotoFreq_MOTO1(XFmotoDuty);
+			}
+			else if(XFmotoRpmSet>(XFmotoRpm+20))
+			{
+				XFmotoDuty += 5;
+				if(XFmotoDuty>10000)
+				{
+					XFmotoDuty =10000;
+					if(XFmotoRpm<300)
+						pSysStatus->XFmotoFault=100;
+				}
+				SetMotoFreq_MOTO1(XFmotoDuty);
+			}
+			else if(XFmotoRpm>(XFmotoRpmSet+120))
+			{
+				if(XFmotoDuty>100)
+				{
+					XFmotoDuty -= 100;
+				}
+				else
 					pSysStatus->XFmotoFault=100;
+				SetMotoFreq_MOTO1(XFmotoDuty);
 			}
-			SetMotoFreq_MOTO1(XFmotoDuty);
-		}
-		else if(XFmotoRpmSet>(XFmotoRpm+20))
-		{
-			XFmotoDuty += 1;
-			if(XFmotoDuty>10000)
+			else if(XFmotoRpm>(XFmotoRpmSet+80))
 			{
-				XFmotoDuty =10000;
-				if(XFmotoRpm<300)
+				if(XFmotoDuty>40)
+				{
+					XFmotoDuty -= 40;
+				}
+				else
 					pSysStatus->XFmotoFault=100;
+				SetMotoFreq_MOTO1(XFmotoDuty);
 			}
-			SetMotoFreq_MOTO1(XFmotoDuty);
-		}
-		else if(XFmotoRpm>(XFmotoRpmSet+60))
-		{
-			if(XFmotoDuty>10)
+			else if(XFmotoRpm>(XFmotoRpmSet+20))
 			{
-				XFmotoDuty -= 10;
+				if(XFmotoDuty>5)
+				{
+					XFmotoDuty -= 5;
+				}
+				else
+					pSysStatus->XFmotoFault=100;
+				SetMotoFreq_MOTO1(XFmotoDuty);
 			}
-			else
-				pSysStatus->XFmotoFault=100;
-			SetMotoFreq_MOTO1(XFmotoDuty);
 		}
-		else if(XFmotoRpm>(XFmotoRpmSet+20))
+		
+		
+		if(PFmotoRpmSet)
 		{
-			if(XFmotoDuty>1)
-			{
-				XFmotoDuty -= 1;
-			}
-			else
-				pSysStatus->XFmotoFault=100;
-			SetMotoFreq_MOTO1(XFmotoDuty);
-		}
-	}
-	else if(XFmotoDutySet != XFmotoDuty)
-	{
-		AirMoto1_DutySet();
-		pSysStatus->XFmotoDuty = XFmotoDuty;
-	}
-	
-	if(PFmotoRpmSet)
-	{
-		pSysStatus->PFmotoFault=1;
+			pSysStatus->PFmotoFault=1;
 
-		if(PFmotoRpmSet>(PFmotoRpm+60))
-		{
-			PFmotoDuty += 20;
-			if(PFmotoDuty>10000)
+			if(PFmotoRpmSet>(PFmotoRpm+120))
 			{
-				PFmotoDuty =10000;
-				if(PFmotoRpm<300)
+				PFmotoDuty += 100;
+				if(PFmotoDuty>10000)
+				{
+					PFmotoDuty =10000;
+					if(PFmotoRpm<300)
+						pSysStatus->PFmotoFault=100;
+				}
+				SetMotoFreq_MOTO2(PFmotoDuty);
+			}
+			else if(PFmotoRpmSet>(PFmotoRpm+80))
+			{
+				PFmotoDuty += 40;
+				if(PFmotoDuty>10000)
+				{
+					PFmotoDuty =10000;
+					if(PFmotoRpm<300)
+						pSysStatus->PFmotoFault=100;
+				}
+				SetMotoFreq_MOTO2(PFmotoDuty);
+			}
+			else if(PFmotoRpmSet>(PFmotoRpm+20))
+			{
+				PFmotoDuty += 5;
+				if(PFmotoDuty>10000)
+				{
+					PFmotoDuty =10000;
+					if(PFmotoRpm<300)
+						pSysStatus->PFmotoFault=100;
+				}
+				SetMotoFreq_MOTO2(PFmotoDuty);
+			}
+			else if(PFmotoRpm>(PFmotoRpmSet+120))
+			{
+				if(PFmotoDuty>100)
+				{
+					PFmotoDuty -= 100;
+				}
+				else
 					pSysStatus->PFmotoFault=100;
+				SetMotoFreq_MOTO2(PFmotoDuty);
 			}
-			SetMotoFreq_MOTO2(PFmotoDuty);
-		}
-		else if(PFmotoRpmSet>(PFmotoRpm+20))
-		{
-			PFmotoDuty += 1;
-			if(PFmotoDuty>10000)
+			else if(PFmotoRpm>(PFmotoRpmSet+80))
 			{
-				PFmotoDuty =10000;
-				if(PFmotoRpm<300)
+				if(PFmotoDuty>40)
+				{
+					PFmotoDuty -= 40;
+				}
+				else
 					pSysStatus->PFmotoFault=100;
+				SetMotoFreq_MOTO2(PFmotoDuty);
 			}
-			SetMotoFreq_MOTO2(PFmotoDuty);
-		}
-		else if(PFmotoRpm>(PFmotoRpmSet+60))
-		{
-			if(PFmotoDuty>10)
+			else if(PFmotoRpm>(PFmotoRpmSet+20))
 			{
-				PFmotoDuty -= 10;
+				if(PFmotoDuty>5)
+				{
+					PFmotoDuty -= 5;
+				}
+				else
+					pSysStatus->PFmotoFault=100;
+				SetMotoFreq_MOTO2(PFmotoDuty);
 			}
-			else
-				pSysStatus->PFmotoFault=100;
-			SetMotoFreq_MOTO2(PFmotoDuty);
-		}
-		else if(PFmotoRpm>(PFmotoRpmSet+20))
-		{
-			if(PFmotoDuty>1)
-			{
-				PFmotoDuty -= 1;
-			}
-			else
-				pSysStatus->PFmotoFault=100;
-			SetMotoFreq_MOTO2(PFmotoDuty);
-		}
-	}
-	else if(PFmotoDutySet != PFmotoDuty)
-	{
-		AirMoto2_DutySet();
-		pSysStatus->PFmotoDuty = PFmotoDuty;
+		}			
 	}
 	
+	if(!XFmotoRpmSet)
+	{
+		if(XFmotoDutySet != XFmotoDuty)
+		{
+			AirMoto1_DutySet();
+			pSysStatus->XFmotoDuty = XFmotoDuty;
+		}
+	}
+	
+	if(!PFmotoRpmSet)
+	{
+		if(PFmotoDutySet != PFmotoDuty)
+		{
+			AirMoto2_DutySet();
+			pSysStatus->PFmotoDuty = PFmotoDuty;
+		}
+	}
 
 }
 

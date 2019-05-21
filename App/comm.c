@@ -100,7 +100,23 @@ void DataReady_CircleSet(void)
 }
 
 
-
+#ifdef WINSEN_HCHO
+void DataReady_HCHO(void)
+{
+	uint16_t val;
+	
+	val=System.Device.Usart1.HCHOppb_Get();
+	
+//	Fill_Buffer((uint8_t*)&CommTxBuffer[FRAME_HEAD], (uint16_t)COMMTXDATASIZE);	
+	CommTxBuffer[FRAME_HEAD]=0x46;
+	CommTxBuffer[FRAME_MAINORDER]=CODE_HCHO_READ;
+	CommTxBuffer[FRAME_DATABEGIN]= (uint8_t)(val&0xff);
+	CommTxBuffer[FRAME_DATABEGIN+1]= (uint8_t)(val>>8);
+	
+	CommTxBuffer[FRAME_END]= Data_Sum(CommTxBuffer,COMMTXDATASIZE-1);
+	
+}
+#else
 void DataReady_PM(void)
 {
 	uint16_t val;
@@ -116,6 +132,7 @@ void DataReady_PM(void)
 	CommTxBuffer[FRAME_END]= Data_Sum(CommTxBuffer,COMMTXDATASIZE-1);
 	
 }
+#endif
 
 void DataReady_CO2(void)
 {
@@ -195,8 +212,15 @@ void CommTalk_Echo(byte length)
 								PostMessage(MessageParaUpdate, CODE_PFMOTODUTY);					
 								break;
 							case CODE_IAQ_READ:
+#ifndef WINSEN_HCHO
 								DataReady_PM();
+#endif							
 								break;
+							case CODE_HCHO_READ:
+#ifdef WINSEN_HCHO
+								DataReady_HCHO();
+#endif
+  							break;
 							case CODE_CO2_READ:
 								DataReady_CO2();
 								break;

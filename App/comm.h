@@ -21,6 +21,7 @@ typedef enum{
  CODE_BYPASS3_SET =(byte)0x0B,
  CODE_BYPASS4_SET =(byte)0x0C,
 // CODE_COOLER_SET =(byte)0x0D,
+ CODE_HCHO_READ =(byte)0x0E,
 	
  CODE_POWER_SET	 =(byte)0x80,
  CODE_BEEP_SETON =(byte)0x7F,
